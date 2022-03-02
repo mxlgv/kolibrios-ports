@@ -1,0 +1,13 @@
+-I../include
+-I../include/asm
+-I../include/uapi
+-I../../libkoscore
+
+-DKOLIBRI
+-D__KERNEL__
+-DCONFIG_X86_32 
+-DCONFIG_DMI 
+-DCONFIG_TINY_RCU
+-DCONFIG_X86_L1_CACHE_SHIFT=6 
+-DCONFIG_ARCH_HAS_CACHE_LINE_SIZE
+-DCONFIG_PRINTK

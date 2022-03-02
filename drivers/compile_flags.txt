@@ -1,0 +1,3 @@
+-Iliblinux3\include
+-D_KERNEL
+-D__GNUC__
