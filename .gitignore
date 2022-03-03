@@ -27,6 +27,7 @@
 *.so
 *.so.*
 *.dylib
+*.sys
 
 # Executables
 *.exe
@@ -50,3 +51,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+drivers/sensors/k10temp/k10temp.sys

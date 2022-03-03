@@ -1,7 +1,8 @@
 #ifndef _KOS_KERNEL_H_
 #define _KOS_KERNEL_H_
 
-#include <stddef.h>
+#include <linux/types.h>
+#include <kos_list.h>
 
 extern void *memset (void *destination, int c, size_t n);
 
@@ -86,8 +87,8 @@ typedef struct {
 	u32  data[5];
 } kevent_t;
 
-struct kos_taskdata
-{
+/*
+struct kos_taskdata {
     u32 event_mask;
     u32 pid;
     u16 r0;
@@ -101,6 +102,79 @@ struct kos_taskdata
     u32 counter_add;
     u32 cpu_usage;
 };
+*/
+
+// struct  BOX in const.inc
+typedef struct { 
+    u32 left;
+    u32 top;
+    u32 width;
+    u32 height;
+} kos_wnd_box_t;
+
+// struct  DBG_REGS in const.inc
+typedef struct {
+    u32 dr0;
+    u32 dr1;
+    u32 dr2;
+    u32 dr3;
+    u32 dr7;
+} kos_dbg_regs_t;
+
+typedef struct {
+    char app_name[16];
+    kos_lhead_t list;
+    u32 process;
+    u32 fpu_state;
+    u32 exc_handler;
+    u32 except_mask;
+    u32 pl0_stack;
+    u32 cursor;
+    u32 fd_ev;
+    u32 bk_ev;
+    u32 fd_obj;
+    u32 bk_obj;
+    u32 saved_esp;
+    u32 io_map[2];
+    u32 dbg_state;
+    u32 cur_dir;
+    u32 wait_timeout;
+    u32 saved_esp0;
+    u32 wait_begin;
+    u32 wait_test;
+    u32 wait_param;
+    u32 tls_base;
+    u32 event_mask;
+    u32 tid;
+    u32 draw_bgr_x;
+    u32 draw_bgr_y;
+    u32 state;
+    u32 wnd_number;
+    u16 __reserved1;
+    u32 wnd_shape;
+    u32 wnd_shape_scale;
+    u32 __reserved2;
+    u32 counter_sum;
+    kos_wnd_box_t saved_box;
+    u32 ipc_start;
+    u32 ipc_size;
+    u32 occurred_events;
+    u32 debugger_slot;
+    u32 terminate_protection;
+    u8  keyboard_mode;
+    u8  captionEncoding;
+    u8  __reserved3[2];
+    u32 exec_params;
+    u32 dbg_event_mem;
+    kos_dbg_regs_t dbg_regs;
+    u32 wnd_caption;
+    kos_wnd_box_t wnd_clientbox;
+    u32 priority;
+    kos_lhead_t in_schedule;
+    u32 counter_add;
+    u32 cpu_usage;
+    u32 __reserved4;
+} kos_appdata_t;
 
 #pragma pack(pop)
 
@@ -171,6 +245,8 @@ u32 __stdcall_imp kos_pci_read32(u32 bus, u32 devfn, u32 reg)                   
 u32 __stdcall_imp kos_pci_write8(u32 bus, u32 devfn, u32 reg, u8 val)           __asm__("PciWrite8");
 u32 __stdcall_imp kos_pci_write16(u32 bus, u32 devfn, u32 reg, u16 val)         __asm__("PciWrite16");
 u32 __stdcall_imp kos_pci_write32(u32 bus, u32 devfn, u32 reg,u32 val)          __asm__("PciWrite32");
+
+kos_appdata_t* __import kos_get_current_slot(void)                              __asm__("GetCurrentSlot");
 
 #define kos_pci_read_byte(tag, reg) \
         kos_pci_read8(PCI_BUS_FROM_TAG(tag),PCI_DFN_FROM_TAG(tag),(reg))

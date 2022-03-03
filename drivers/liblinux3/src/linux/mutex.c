@@ -35,8 +35,7 @@ static inline void mutex_set_owner(struct mutex *lock)
  */
 #define MUTEX_SHOW_NO_WAITER(mutex) (atomic_read(&(mutex)->count) >= 0)
 
-void
-__mutex_init(struct mutex *lock, const char *name, struct lock_class_key *key)
+void __mutex_init(struct mutex *lock, const char *name, struct lock_class_key *key)
 {
     atomic_set(&lock->count, 1);
 //    spin_lock_init(&lock->wait_lock);
@@ -96,8 +95,8 @@ static inline int __mutex_fastpath_lock_retval(atomic_t *count)
         return 0;
 }
 
-static __always_inline void
-ww_mutex_set_context_fastpath(struct ww_mutex *lock,
+static __always_inline 
+void ww_mutex_set_context_fastpath(struct ww_mutex *lock,
                                struct ww_acquire_ctx *ctx)
 {
     u32 flags;
@@ -128,12 +127,12 @@ ww_mutex_set_context_fastpath(struct ww_mutex *lock,
      */
     flags = safe_cli();
     list_for_each_entry(cur, &lock->base.wait_list, list) {
-        ((struct kos_taskdata*)cur->task)->state = 0;
+        ((kos_appdata_t*)cur->task)->state = 0;
     }
     safe_sti(flags);
 }
 
-ww_mutex_set_context_slowpath(struct ww_mutex *lock,
+void ww_mutex_set_context_slowpath(struct ww_mutex *lock,
                               struct ww_acquire_ctx *ctx)
 {
     struct mutex_waiter *cur;
@@ -146,7 +145,7 @@ ww_mutex_set_context_slowpath(struct ww_mutex *lock,
      * so they can recheck if they have to back off.
      */
     list_for_each_entry(cur, &lock->base.wait_list, list) {
-        ((struct kos_taskdata*)cur->task)->state = 0;
+        ((kos_appdata_t*)cur->task)->state = 0;
     }
 }
 
@@ -154,13 +153,13 @@ int __ww_mutex_lock_slowpath(struct ww_mutex *ww, struct ww_acquire_ctx *ctx)
 {
     struct mutex *lock;
     struct mutex_waiter waiter;
-    struct kos_taskdata* taskdata;
+    kos_appdata_t* appdata;
     u32 eflags;
     int ret = 0;
 
     lock = &ww->base;
-    taskdata = (struct kos_taskdata*)(0x80003010);
-    waiter.task = (u32*)taskdata;
+    appdata = kos_get_current_slot();
+    waiter.task = (u32*)appdata;
 
     eflags = safe_cli();
 
@@ -176,7 +175,7 @@ int __ww_mutex_lock_slowpath(struct ww_mutex *ww, struct ww_acquire_ctx *ctx)
             if (ret)
                 goto err;
         };
-        taskdata->state = 1;
+        appdata->state = 1;
         kos_change_task();
     };
 

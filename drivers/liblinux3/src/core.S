@@ -250,6 +250,8 @@ _WaitEventTimeout:
 
 _FS_Service:
 
+_GetCurrentSlot:
+
         ret
 
 .section .drectve
@@ -333,3 +335,4 @@ _FS_Service:
         .ascii " -export:WaitEvent"            # stdcall
         .ascii " -export:WaitEventTimeout"     # stdcall
         .ascii " -export:FS_Service"           # watch system call 70
+        .ascii " -export:GetCurrentSlot"
